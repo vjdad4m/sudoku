@@ -1,4 +1,63 @@
 package com.vadam.sudoku.service;
 
+import com.vadam.sudoku.exception.PersistenceException;
+import com.vadam.sudoku.model.Difficulty;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 public class StatisticsService {
+    private final Path file;
+    private final ObjectMapper mapper = new ObjectMapper();
+    private Map<String, Object> data = new HashMap<>();
+
+    public StatisticsService(Path file) {
+        this.file = file;
+        load();
+    }
+
+    private void load() {
+        try {
+            if (Files.exists(file)) {
+                data = mapper.readValue(file.toFile(), Map.class);
+            }
+        } catch (IOException e) {
+            data = new HashMap<>();
+        }
+    }
+
+    private void save() {
+        try {
+            Files.createDirectories(file.getParent());
+            mapper.writerWithDefaultPrettyPrinter().writeValue(file.toFile(), data);
+        } catch (IOException e) {
+            throw new PersistenceException("Could not save statistics", e);
+        }
+    }
+
+    public void recordGame(Difficulty d, long millis) {
+        String keyCount = d.name() + ".count";
+        String keyBest = d.name() + ".best";
+        int count = ((Number) data.getOrDefault(keyCount, 0)).intValue();
+        data.put(keyCount, count + 1);
+        Number best = (Number) data.get(keyBest);
+        if (best == null || millis < best.longValue())
+            data.put(keyBest, millis);
+        save();
+    }
+
+    public Optional<Long> bestTime(Difficulty d) {
+        Number n = (Number) data.get(d.name() + ".best");
+        return n == null ? Optional.empty() : Optional.of(n.longValue());
+    }
+
+    public int gameCount(Difficulty d) {
+        return ((Number) data.getOrDefault(d.name() + ".count", 0)).intValue();
+    }
 }
