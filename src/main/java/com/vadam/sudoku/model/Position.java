@@ -2,7 +2,7 @@ package com.vadam.sudoku.model;
 
 import java.util.Objects;
 
-public class Position {
+public final class Position {
     private final int row;
     private final int col;
 

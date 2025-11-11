@@ -1,6 +1,6 @@
 package com.vadam.sudoku.model;
 
-public class CandidateSet {
+public final class CandidateSet {
     private int bits;
 
     public CandidateSet() {
