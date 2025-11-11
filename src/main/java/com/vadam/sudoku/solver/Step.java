@@ -26,7 +26,7 @@ public class Step {
         return type;
     }
 
-    public Position gePosition() {
+    public Position getPosition() {
         return position;
     }
 

@@ -23,6 +23,7 @@ public class NakedPairsStrategy implements Strategy {
                 if (board.get(r, c1) != 0) {
                     continue;
                 }
+                CandidateSet a = cand[r][c1];
                 for (int c2 = c1 + 1; c2 < 9; c2++) {
                     if (board.get(r, c2) != 0) {
                         continue;
