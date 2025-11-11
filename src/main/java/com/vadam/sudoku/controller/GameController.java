@@ -70,11 +70,15 @@ public class GameController {
     }
 
     public void solve() {
+        boolean wasSolved = game.board().isSolved();
         boolean ok = hints.solveFully(game.board());
         if (!ok) {
             JOptionPane.showMessageDialog(null, "No solution found.");
         }
         timer.stop();
+        if (!wasSolved || !game.board().isSolved()) {
+            game.refreshBoard();
+        }
     }
 
     public void save(Path path) {
@@ -91,7 +95,8 @@ public class GameController {
             b.setAll(s.getValues(), s.getFixed());
             game.newGame(b, s.getDifficulty());
             timer.stop();
-            timer.reset();
+            timer.setElapsedMillis(s.getElapsedMillis());
+            timer.start();
         }
     }
 

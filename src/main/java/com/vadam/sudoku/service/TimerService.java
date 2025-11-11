@@ -40,6 +40,11 @@ public class TimerService {
         lastStart = System.currentTimeMillis();
     }
 
+    public void setElapsedMillis(long millis) {
+        elapsed.set(Math.max(0, millis));
+        lastStart = System.currentTimeMillis();
+    }
+
     public long elapsedMillis() {
         return running ? elapsed.get() + (System.currentTimeMillis() - lastStart) : elapsed.get();
     }

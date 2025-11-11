@@ -2,7 +2,6 @@ package com.vadam.sudoku.service;
 
 import com.vadam.sudoku.config.Settings;
 import com.vadam.sudoku.exception.InvalidMoveException;
-import com.vadam.sudoku.generator.SudokuGenerator;
 import com.vadam.sudoku.model.*;
 import com.vadam.sudoku.model.event.EventBus;
 import com.vadam.sudoku.model.event.GameEvent;
@@ -16,6 +15,7 @@ public class GameService {
     private final EventBus bus;
     private final Settings settings;
     private Difficulty difficulty = Difficulty.EASY;
+    private boolean solvedAnnounced = false;
     private final Deque<Move> undo = new ArrayDeque<>();
     private final Deque<Move> redo = new ArrayDeque<>();
 
@@ -46,7 +46,7 @@ public class GameService {
         undo.clear();
         redo.clear();
         bus.publish(new GameEvent(GameEvent.Type.NEW_GAME, "New game: " + d));
-        bus.publish(new GameEvent(GameEvent.Type.BOARD_CHANGED, null));
+        notifyBoardChanged();
     }
 
     public void setValue(Position p, int digit) {
@@ -80,6 +80,7 @@ public class GameService {
                 }
             }
         }
+        notifyBoardChanged();
     }
 
     public void clearValue(Position p) {
@@ -93,7 +94,7 @@ public class GameService {
         board.notes(p).toggle(digit);
         undo.push(new Move.NoteToggleMove(p, digit));
         redo.clear();
-        bus.publish(new GameEvent(GameEvent.Type.BOARD_CHANGED, null));
+        notifyBoardChanged();
     }
 
     public void undo() {
@@ -107,7 +108,7 @@ public class GameService {
             board.notes(nm.pos).toggle(nm.digit);
         }
         redo.push(m);
-        bus.publish(new GameEvent(GameEvent.Type.BOARD_CHANGED, null));
+        notifyBoardChanged();
     }
 
     public void redo() {
@@ -120,6 +121,11 @@ public class GameService {
             board.notes(nm.pos).toggle(nm.digit);
         }
         undo.push(m);
+        notifyBoardChanged();
+    }
+
+    public void refreshBoard() {
+        notifyBoardChanged();
     }
 
     public Optional<String> check() {
@@ -130,5 +136,17 @@ public class GameService {
             return Optional.of("Solved!");
         }
         return Optional.empty();
+    }
+
+    private void notifyBoardChanged() {
+        bus.publish(new GameEvent(GameEvent.Type.BOARD_CHANGED, null));
+        if (board.isSolved()) {
+            if (!solvedAnnounced) {
+                bus.publish(new GameEvent(GameEvent.Type.SOLVED, null));
+                solvedAnnounced = true;
+            }
+        } else {
+            solvedAnnounced = false;
+        }
     }
 }
