@@ -3,7 +3,6 @@ package com.vadam.sudoku.solver;
 import com.vadam.sudoku.model.Board;
 import com.vadam.sudoku.model.Position;
 import com.vadam.sudoku.solver.strategy.SingleCandidateStrategy;
-import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
