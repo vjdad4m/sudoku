@@ -34,7 +34,7 @@ public class NakedPairsStrategy implements Strategy {
                         int d1 = Integer.numberOfTrailingZeros(pairBits & -pairBits);
                         int d2 = Integer.numberOfTrailingZeros((pairBits & ~(1 << d1)) & -((pairBits & ~(1 << d1))));
                         for (int c3 = 0; c3 < 9; c3++) {
-                            if (c3 != c1 && c3 != c2 && board.get(r, c3) != 0) {
+                            if (c3 != c1 && c3 != c2 && board.get(r, c3) == 0) {
                                 CandidateSet cs = cand[r][c3];
                                 if ((cs.raw() & pairBits) != 0) {
                                     int d = (cs.has(d1) ? d1 : d2);
