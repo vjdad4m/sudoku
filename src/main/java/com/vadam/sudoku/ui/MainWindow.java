@@ -3,7 +3,9 @@ package com.vadam.sudoku.ui;
 import com.vadam.sudoku.config.Settings;
 import com.vadam.sudoku.controller.GameController;
 import com.vadam.sudoku.model.Difficulty;
+import com.vadam.sudoku.model.event.GameEvent;
 import com.vadam.sudoku.service.GameService;
+import com.vadam.sudoku.service.StatisticsService;
 import com.vadam.sudoku.service.TimerService;
 
 import javax.swing.*;
@@ -15,15 +17,18 @@ public class MainWindow extends JFrame {
     private final GameService game;
     private final TimerService timer;
     private final Settings settings;
+    private final StatisticsService stats;
     private final BoardPanel boardPanel;
     private final StatusBar statusBar;
 
-    public MainWindow(GameController controller, GameService game, TimerService timer, Settings settings) {
+    public MainWindow(GameController controller, GameService game, TimerService timer, Settings settings,
+            StatisticsService stats) {
         super("Sudoku");
         this.controller = controller;
         this.game = game;
         this.timer = timer;
         this.settings = settings;
+        this.stats = stats;
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(720, 800);
@@ -38,8 +43,11 @@ public class MainWindow extends JFrame {
         add(statusBar, BorderLayout.SOUTH);
         setJMenuBar(buildMenu());
         game.bus().add(evt -> {
-            if (evt.getType() == com.vadam.sudoku.model.event.GameEvent.Type.SOLVED) {
+            if (evt.getType() == GameEvent.Type.SOLVED) {
                 timer.stop();
+                if (!GameEvent.AUTO_SOLVE.equals(evt.getMessage())) {
+                    stats.recordGame(game.difficulty(), timer.elapsedMillis());
+                }
                 SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(this, "Solved!"));
             }
         });
@@ -149,6 +157,14 @@ public class MainWindow extends JFrame {
         pencil.addActionListener(e -> settings.setPencilMode(pencil.isSelected()));
         options.add(pencil);
         mb.add(options);
+
+        JMenu statsMenu = new JMenu("Statistics");
+        statsMenu.add(new JMenuItem(new AbstractAction("View...") {
+            public void actionPerformed(ActionEvent e) {
+                showStatisticsDialog();
+            }
+        }));
+        mb.add(statsMenu);
         return mb;
     }
 
@@ -159,5 +175,31 @@ public class MainWindow extends JFrame {
                 JOptionPane.PLAIN_MESSAGE, null, diffs, diffs[1]);
         if (sel != null)
             controller.newGame(sel);
+    }
+
+    private void showStatisticsDialog() {
+        String[] cols = { "Difficulty", "Games Played", "Best Time" };
+        Object[][] rows = new Object[Difficulty.values().length][cols.length];
+        Difficulty[] diffs = Difficulty.values();
+        for (int i = 0; i < diffs.length; i++) {
+            Difficulty d = diffs[i];
+            rows[i][0] = d.name();
+            rows[i][1] = stats.gameCount(d);
+            rows[i][2] = stats.bestTime(d).map(this::formatDuration).orElse("—");
+        }
+        JTable table = new JTable(rows, cols);
+        table.setEnabled(false);
+        table.setRowSelectionAllowed(false);
+        table.setColumnSelectionAllowed(false);
+        JScrollPane scroll = new JScrollPane(table);
+        scroll.setPreferredSize(new Dimension(400, 200));
+        JOptionPane.showMessageDialog(this, scroll, "Statistics", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private String formatDuration(long millis) {
+        long seconds = millis / 1000;
+        long minutes = seconds / 60;
+        long remaining = seconds % 60;
+        return String.format("%02d:%02d", minutes, remaining);
     }
 }

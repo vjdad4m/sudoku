@@ -5,6 +5,8 @@ public class GameEvent {
         BOARD_CHANGED, NEW_GAME, TIMER_TICK, SOLVED, MESSAGE
     }
 
+    public static final String AUTO_SOLVE = "AUTO_SOLVE";
+
     private final Type type;
     private final String message;
 

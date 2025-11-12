@@ -70,6 +70,7 @@ public class GameController {
     }
 
     public void solve() {
+        game.markAutoSolvePending();
         boolean wasSolved = game.board().isSolved();
         boolean ok = hints.solveFully(game.board());
         if (!ok) {
@@ -79,6 +80,7 @@ public class GameController {
         if (!wasSolved || !game.board().isSolved()) {
             game.refreshBoard();
         }
+        game.clearAutoSolvePending();
     }
 
     public void save(Path path) {

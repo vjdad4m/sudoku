@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -19,6 +20,15 @@ public class StatisticsService {
 
     public StatisticsService(Path file) {
         this.file = file;
+        load();
+    }
+
+    public StatisticsService() {
+        String home = System.getProperty("user.home");
+        if (home == null || home.isBlank()) {
+            home = ".";
+        }
+        this.file = Paths.get(home, ".sudoku", "statistics.json");
         load();
     }
 

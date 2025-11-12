@@ -1,18 +1,24 @@
 package com.vadam.sudoku.config;
 
+import java.util.function.Consumer;
+
 public class Settings {
     private boolean errorHighlight = true;
     private boolean autoPencilUpdate = true;
     private boolean applyHint = true;
     private boolean highlightSameDigits = true;
     private boolean pencilMode = false;
+    private Consumer<Settings> onChange;
 
     public boolean isErrorHighlight() {
         return errorHighlight;
     }
 
     public void setErrorHighlight(boolean v) {
-        this.errorHighlight = v;
+        if (this.errorHighlight != v) {
+            this.errorHighlight = v;
+            notifyChanged();
+        }
     }
 
     public boolean isAutoPencilUpdate() {
@@ -20,7 +26,10 @@ public class Settings {
     }
 
     public void setAutoPencilUpdate(boolean v) {
-        this.autoPencilUpdate = v;
+        if (this.autoPencilUpdate != v) {
+            this.autoPencilUpdate = v;
+            notifyChanged();
+        }
     }
 
     public boolean isApplyHint() {
@@ -28,7 +37,10 @@ public class Settings {
     }
 
     public void setApplyHint(boolean v) {
-        this.applyHint = v;
+        if (this.applyHint != v) {
+            this.applyHint = v;
+            notifyChanged();
+        }
     }
 
     public boolean isHighlightSameDigits() {
@@ -36,7 +48,10 @@ public class Settings {
     }
 
     public void setHighlightSameDigits(boolean v) {
-        this.highlightSameDigits = v;
+        if (this.highlightSameDigits != v) {
+            this.highlightSameDigits = v;
+            notifyChanged();
+        }
     }
 
     public boolean isPencilMode() {
@@ -44,6 +59,19 @@ public class Settings {
     }
 
     public void setPencilMode(boolean pencilMode) {
-        this.pencilMode = pencilMode;
+        if (this.pencilMode != pencilMode) {
+            this.pencilMode = pencilMode;
+            notifyChanged();
+        }
+    }
+
+    public void setChangeListener(Consumer<Settings> listener) {
+        this.onChange = listener;
+    }
+
+    private void notifyChanged() {
+        if (onChange != null) {
+            onChange.accept(this);
+        }
     }
 }

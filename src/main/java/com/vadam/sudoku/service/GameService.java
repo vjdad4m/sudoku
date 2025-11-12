@@ -16,6 +16,7 @@ public class GameService {
     private final Settings settings;
     private Difficulty difficulty = Difficulty.EASY;
     private boolean solvedAnnounced = false;
+    private boolean autoSolvePending = false;
     private final Deque<Move> undo = new ArrayDeque<>();
     private final Deque<Move> redo = new ArrayDeque<>();
 
@@ -128,6 +129,14 @@ public class GameService {
         notifyBoardChanged();
     }
 
+    public void markAutoSolvePending() {
+        autoSolvePending = true;
+    }
+
+    public void clearAutoSolvePending() {
+        autoSolvePending = false;
+    }
+
     public Optional<String> check() {
         if (!board.isValidSoFar()) {
             return Optional.of("Conflicts found.");
@@ -142,11 +151,14 @@ public class GameService {
         bus.publish(new GameEvent(GameEvent.Type.BOARD_CHANGED, null));
         if (board.isSolved()) {
             if (!solvedAnnounced) {
-                bus.publish(new GameEvent(GameEvent.Type.SOLVED, null));
+                String msg = autoSolvePending ? GameEvent.AUTO_SOLVE : null;
+                bus.publish(new GameEvent(GameEvent.Type.SOLVED, msg));
                 solvedAnnounced = true;
             }
+            autoSolvePending = false;
         } else {
             solvedAnnounced = false;
+            autoSolvePending = false;
         }
     }
 }

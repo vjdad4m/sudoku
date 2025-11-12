@@ -11,6 +11,7 @@ import com.vadam.sudoku.model.Difficulty;
 import com.vadam.sudoku.model.event.EventBus;
 import com.vadam.sudoku.service.GameService;
 import com.vadam.sudoku.service.HintService;
+import com.vadam.sudoku.service.StatisticsService;
 import com.vadam.sudoku.service.TimerService;
 import com.vadam.sudoku.ui.MainWindow;
 
@@ -23,10 +24,12 @@ public class SudokuApplication {
             }
             EventBus bus = new EventBus();
             Settings settings = PreferencesManager.loadOrDefault();
+            settings.setChangeListener(PreferencesManager::save);
             TimerService timer = new TimerService(bus);
             GameService game = new GameService(bus, settings);
+            StatisticsService stats = new StatisticsService();
             GameController controller = new GameController(game, new SudokuGenerator(), new HintService(), timer);
-            MainWindow win = new MainWindow(controller, game, timer, settings);
+            MainWindow win = new MainWindow(controller, game, timer, settings, stats);
             win.setVisible(true);
             controller.newGame(Difficulty.EASY);
         });
