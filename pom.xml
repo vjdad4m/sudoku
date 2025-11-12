@@ -18,6 +18,7 @@
     <assertj.version>3.27.6</assertj.version>
     <slf4j.version>2.0.17</slf4j.version>
     <jackson.version>2.20.1</jackson.version>
+    <jacoco.version>0.8.12</jacoco.version>
   </properties>
 
   <dependencies>
@@ -121,6 +122,31 @@
           <classpathScope>runtime</classpathScope>
           <cleanupDaemonThreads>false</cleanupDaemonThreads>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco.version}</version>
+        <executions>
+          <execution>
+            <id>prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>com/vadam/sudoku/*</include>
+              </includes>
+            </configuration>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
