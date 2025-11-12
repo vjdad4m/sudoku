@@ -18,7 +18,7 @@ public class GameEvent {
     public Type getType() {
         return type;
     }
-    
+
     public String getMessage() {
         return message;
     }
