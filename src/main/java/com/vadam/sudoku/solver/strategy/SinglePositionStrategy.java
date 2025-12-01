@@ -8,6 +8,9 @@ import com.vadam.sudoku.solver.Step;
 import com.vadam.sudoku.solver.Strategy;
 
 public class SinglePositionStrategy implements Strategy {
+    /**
+     * Megkeresi azt a helyet a sorban, oszlopban vagy blokkban, ahová csak egy adott szám illik.
+     */
     @Override
     public Optional<Step> next(Board board) {
         for (int r = 0; r < 9; r++) {

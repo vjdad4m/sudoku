@@ -21,6 +21,9 @@ public class MainWindow extends JFrame {
     private final BoardPanel boardPanel;
     private final StatusBar statusBar;
 
+    /**
+     * Összerakja az ablakot a táblapanellel, menükkel és státuszsorral.
+     */
     public MainWindow(GameController controller, GameService game, TimerService timer, Settings settings,
             StatisticsService stats) {
         super("Sudoku");
@@ -54,6 +57,9 @@ public class MainWindow extends JFrame {
 
     }
 
+    /**
+     * Létrehozza a gombokat tartalmazó eszköztárat az alap műveletekkel.
+     */
     private JToolBar buildToolBar() {
         JToolBar tb = new JToolBar();
         tb.setFloatable(false);
@@ -108,6 +114,9 @@ public class MainWindow extends JFrame {
         return tb;
     }
 
+    /**
+     * Összeállítja a játék-, opció- és statisztikamenüket.
+     */
     private JMenuBar buildMenu() {
         JMenuBar mb = new JMenuBar();
         JMenu gameM = new JMenu("Game");
@@ -168,6 +177,9 @@ public class MainWindow extends JFrame {
         return mb;
     }
 
+    /**
+     * Egyszerű párbeszédablak bekéri a nehézségi szintet és új játékot indít.
+     */
     private void showNewGameDialog() {
         Difficulty[] diffs = Difficulty.values();
         Difficulty sel = (Difficulty) JOptionPane.showInputDialog(this,
@@ -177,6 +189,9 @@ public class MainWindow extends JFrame {
             controller.newGame(sel);
     }
 
+    /**
+     * Megjeleníti táblázatban a játékok számát és legjobb idejét nehézségenként.
+     */
     private void showStatisticsDialog() {
         String[] cols = { "Difficulty", "Games Played", "Best Time" };
         Object[][] rows = new Object[Difficulty.values().length][cols.length];
@@ -196,6 +211,9 @@ public class MainWindow extends JFrame {
         JOptionPane.showMessageDialog(this, scroll, "Statistics", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    /**
+     * Perc:másodperc formátumú szöveggé alakítja az időt.
+     */
     private String formatDuration(long millis) {
         long seconds = millis / 1000;
         long minutes = seconds / 60;

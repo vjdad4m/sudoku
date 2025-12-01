@@ -14,11 +14,17 @@ public class TimerService {
     private final Timer timer;
     private final EventBus bus;
 
+    /**
+     * Másodpercenkénti ütemezéssel figyeli az időt, és ütemezett eseményeket küld.
+     */
     public TimerService(EventBus bus) {
         this.bus = bus;
         timer = new Timer(1000, e -> bus.publish((new GameEvent(GameEvent.Type.TIMER_TICK, null))));
     }
 
+    /**
+     * Elindítja az időmérőt.
+     */
     public void start() {
         if (!running) {
             lastStart = System.currentTimeMillis();
@@ -27,6 +33,9 @@ public class TimerService {
         }
     }
 
+    /**
+     * Megállítja az időmérőt.
+     */
     public void stop() {
         if (running) {
             elapsed.addAndGet(System.currentTimeMillis() - lastStart);
@@ -35,20 +44,32 @@ public class TimerService {
         }
     }
 
+    /**
+     * Nullázza az eltelt időt és újraindítja az időmérőt.
+    */
     public void reset() {
         elapsed.set(0);
         lastStart = System.currentTimeMillis();
     }
 
+    /**
+     * Beállítja az eltelt időt ezredmásodpercekben.
+     */
     public void setElapsedMillis(long millis) {
         elapsed.set(Math.max(0, millis));
         lastStart = System.currentTimeMillis();
     }
 
+    /**
+     * Visszaadja az eltelt időt ezredmásodpercekben.
+     */
     public long elapsedMillis() {
         return running ? elapsed.get() + (System.currentTimeMillis() - lastStart) : elapsed.get();
     }
 
+    /**
+     * Visszaadja, hogy az időmérő fut-e.
+     */
     public boolean isRunning() {
         return running;
     }

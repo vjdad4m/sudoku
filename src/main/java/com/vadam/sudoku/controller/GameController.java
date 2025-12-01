@@ -21,6 +21,9 @@ public class GameController {
     private final FileGameRepository repo = new FileGameRepository();
     private final ImportExportService io = new ImportExportService();
 
+    /**
+     * Összekapcsolja a játéklogikát a vezérlővel.
+     */
     public GameController(GameService game, SudokuGenerator generator, HintService hints, TimerService timer) {
         this.game = game;
         this.generator = generator;
@@ -28,6 +31,9 @@ public class GameController {
         this.timer = timer;
     }
 
+    /**
+     * Létrehoz és elindít egy új játékot a kiválasztott nehézséggel.
+     */
     public void newGame(Difficulty d) {
         Board puzzle = generator.generate(d);
         game.newGame(puzzle, d);
@@ -35,22 +41,37 @@ public class GameController {
         timer.start();
     }
 
+    /**
+     * Értéket ír a megadott cellába a játék szolgáltatáson keresztül.
+     */
     public void setValue(Position p, int d) {
         game.setValue(p, d);
     }
 
+    /**
+     * Átkapcsolja a megadott cella ceruzajegyét.
+     */
     public void toggleNote(Position p, int d) {
         game.toggleNote(p, d);
     }
 
+    /**
+     * Visszavonja az utolsó lépést, ha létezik.
+     */
     public void undo() {
         game.undo();
     }
 
+    /**
+     * Újraalkalmazza a legutóbb visszavont lépést, ha létezik.
+     */
     public void redo() {
         game.redo();
     }
 
+    /**
+     * Megkeresi a következő logikai lépést, opcionálisan alkalmazza, és megjeleníti az indoklást.
+     */
     public void showHint(boolean apply) {
         Optional<Step> s = hints.nextStep(game.board());
         if (s.isEmpty()) {
@@ -64,11 +85,17 @@ public class GameController {
         }
     }
 
+    /**
+     * Ellenőrzi a tábla állapotát és üzenetben jelzi az eredményt.
+     */
     public void check() {
         Optional<String> msg = game.check();
         JOptionPane.showMessageDialog(null, msg.orElse("No conflicts so far."));
     }
 
+    /**
+     * Megpróbálja logikával, majd visszalépéses kereséssel megoldani a feladványt, és frissíti az órát.
+     */
     public void solve() {
         game.markAutoSolvePending();
         boolean wasSolved = game.board().isSolved();
@@ -83,12 +110,18 @@ public class GameController {
         game.clearAutoSolvePending();
     }
 
+    /**
+     * Elmenti a jelenlegi játékállapotot a megadott elérési útra.
+     */
     public void save(Path path) {
         GameState state = new GameState(
                 game.board().values(), game.board().fixed(), timer.elapsedMillis(), game.difficulty());
         repo.save(path, state);
     }
 
+    /**
+     * Betölt egy korábban elmentett állapotot és visszaállítja az órát is.
+     */
     public void load(Path path) {
         Optional<GameState> st = repo.load(path);
         if (st.isPresent()) {
@@ -102,6 +135,9 @@ public class GameController {
         }
     }
 
+    /**
+     * Fájlból importálja a rejtvényt, majd új játékot indít vele.
+     */
     public void importPuzzle(Path path) {
         try {
             Board b = io.importFromFile(path);
@@ -111,6 +147,9 @@ public class GameController {
         }
     }
 
+    /**
+     * Fájlba exportálja az aktuális rejtvényt.
+     */
     public void exportPuzzle(Path path) {
         try {
             io.exportToFile(game.board(), path);

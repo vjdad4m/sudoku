@@ -9,6 +9,9 @@ import com.vadam.sudoku.solver.Step;
 import com.vadam.sudoku.solver.Strategy;
 
 public class NakedPairsStrategy implements Strategy {
+    /**
+     * Megkeresi az üres sorokban a csupasz párokat, és javaslatot ad egy kizárt jelölt törlésére.
+     */
     @Override
     public Optional<Step> next(Board board) {
         CandidateSet[][] cand = new CandidateSet[9][9];

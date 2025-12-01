@@ -20,36 +20,57 @@ public class GameService {
     private final Deque<Move> undo = new ArrayDeque<>();
     private final Deque<Move> redo = new ArrayDeque<>();
 
+    /**
+     * Inicializálja a játékot a megadott eseménybusz és beállítások referenciáival.
+     */
     public GameService(EventBus bus, Settings settings) {
         this.bus = bus;
         this.settings = settings;
     }
 
+    /**
+     * Visszaadja a játékhoz tartozó táblát.
+     */
     public Board board() {
         return board;
     }
 
+    /**
+     * Visszaadja az eseménybuszt.
+     */
     public EventBus bus() {
         return bus;
     }
 
+    /**
+     * Visszaadja a beállításokat tartalmazó objektumot.
+     */
     public Settings settings() {
         return settings;
     }
 
+    /**
+     * Visszaadja az aktuális nehézségi szintet.
+     */
     public Difficulty difficulty() {
         return difficulty;
     }
 
-    public void newGame(Board puizzle, Difficulty d) {
+    /**
+     * Új játékot indít a megadott tábla és nehézség alapján, törli az előző lépéseket és értesíti a feliratkozott komponenseket.
+     */
+    public void newGame(Board puzzle, Difficulty d) {
         difficulty = d;
-        board.setAll(puizzle.values(), puizzle.fixed());
+        board.setAll(puzzle.values(), puzzle.fixed());
         undo.clear();
         redo.clear();
         bus.publish(new GameEvent(GameEvent.Type.NEW_GAME, "New game: " + d));
         notifyBoardChanged();
     }
 
+    /**
+     * Értéket ír egy nem fix cellába, frissíti a jegyzeteket, ha szükséges, és értesíti a feliratkozott komponenseket.
+     */
     public void setValue(Position p, int digit) {
         if (board.isFixed(p)) {
             throw new InvalidMoveException("Cell is fixed");
@@ -84,10 +105,16 @@ public class GameService {
         notifyBoardChanged();
     }
 
+    /**
+     * Nullázza a megadott cella értékét.
+     */
     public void clearValue(Position p) {
         setValue(p, 0);
     }
 
+    /**
+     * Átkapcsolja egy ceruzajegyzet állapotát a megadott cellában, és értesíti a feliratkozott komponenseket.
+     */
     public void toggleNote(Position p, int digit) {
         if (board.isFixed(p)) {
             return;
@@ -98,6 +125,9 @@ public class GameService {
         notifyBoardChanged();
     }
 
+    /**
+     * Visszavonja a legutóbbi lépést, amennyiben létezik.
+     */
     public void undo() {
         if (undo.isEmpty()) {
             return;
@@ -112,6 +142,9 @@ public class GameService {
         notifyBoardChanged();
     }
 
+    /**
+     * Újra végrehajtja a legutóbb visszavont lépést, amennyiben létezik.
+     */
     public void redo() {
         if (redo.isEmpty())
             return;
@@ -125,18 +158,30 @@ public class GameService {
         notifyBoardChanged();
     }
 
+    /**
+     * Értesíti a feliratkozott komponenseket a tábla frissítéséről.
+    */
     public void refreshBoard() {
         notifyBoardChanged();
     }
 
+    /**
+     * Állítja az automata megoldás jelzőt.
+     */
     public void markAutoSolvePending() {
         autoSolvePending = true;
     }
 
+    /**
+     * Törli az automata megoldás jelzőt.
+     */
     public void clearAutoSolvePending() {
         autoSolvePending = false;
     }
 
+    /**
+     * Ellenőrzi a tábla állapotát, és visszaad egy üzenetet, ha konfliktusok vannak vagy a tábla megoldott.
+     */
     public Optional<String> check() {
         if (!board.isValidSoFar()) {
             return Optional.of("Conflicts found.");
@@ -147,6 +192,9 @@ public class GameService {
         return Optional.empty();
     }
 
+    /**
+     * Értesíti a feliratkozott komponenseket a tábla változásáról, és kezeli a megoldott állapotot.
+     */
     private void notifyBoardChanged() {
         bus.publish(new GameEvent(GameEvent.Type.BOARD_CHANGED, null));
         if (board.isSolved()) {

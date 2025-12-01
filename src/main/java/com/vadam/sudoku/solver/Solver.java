@@ -12,10 +12,16 @@ import com.vadam.sudoku.util.ValidationUtils;
 public class Solver {
     private final List<Strategy> strategies = new ArrayList<>();
 
+    /**
+     * A megadott stratégiákat használó megoldót hoz létre.
+     */
     public Solver(List<Strategy> strategies) {
         this.strategies.addAll(strategies);
     }
 
+    /**
+     * Sorban kipróbálja a stratégiákat, és visszaadja az első talált logikai lépést.
+     */
     public Optional<Step> nextStep(Board board) {
         for (Strategy s : strategies) {
             Optional<Step> step = s.next(board);
@@ -26,6 +32,9 @@ public class Solver {
         return Optional.empty();
     }
 
+    /**
+     * Addig alkalmaz logikai stratégiákat, amíg talál új lépéseket, és összegyűjti őket.
+     */
     public List<Step> solveLogically(Board board) {
         List<Step> steps = new ArrayList<>();
         while (true) {
@@ -40,6 +49,9 @@ public class Solver {
         return steps;
     }
 
+    /**
+     * Visszalépéses kereséssel próbálja kitölteni a táblát a lehetséges jelöltek alapján.
+     */
     public boolean solveBacktracking(Board board) {
         int r = -1;
         int c = -1;
@@ -77,10 +89,16 @@ public class Solver {
         return false;
     }
 
+    /**
+     * Megszámolja az elérhető megoldások számát a megadott limitig.
+     */
     public int countSolutions(Board board, int maxCount) {
         return count(board, maxCount, 0);
     }
 
+    /**
+     * Rekurzívan számolja a lehetséges megoldásokat.
+     */
     private int count(Board b, int max, int found) {
         if (found >= max) {
             return found;

@@ -1,9 +1,15 @@
 package com.vadam.sudoku.util;
 
 public class ValidationUtils {
+    /**
+     * Segédosztály, nem példányosítható.
+     */
     private ValidationUtils() {
     }
 
+    /**
+     * Ellenőrzi, hogy a tábla sorai, oszlopai és blokkjai nem tartalmaznak-e duplikációt vagy érvénytelen számot.
+     */
     public static boolean isValid(int[][] v) {
         for (int r = 0; r < 9; r++) {
             boolean[] seen = new boolean[10];

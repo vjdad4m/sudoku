@@ -14,6 +14,9 @@ import java.util.Optional;
 public class FileGameRepository implements GameRepository {
     private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
+    /**
+     * A megadott játékállapotot JSON formában fájlba írja.
+     */
     @Override
     public void save(Path file, GameState state) {
         try {
@@ -24,6 +27,9 @@ public class FileGameRepository implements GameRepository {
         }
     }
 
+    /**
+     * Beolvassa a fájlból a játékállapotot, ha létezik, különben üres Optionalt ad.
+     */
     @Override
     public Optional<GameState> load(Path file) {
         try {

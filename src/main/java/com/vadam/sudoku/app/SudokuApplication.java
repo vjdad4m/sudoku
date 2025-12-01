@@ -16,6 +16,9 @@ import com.vadam.sudoku.service.TimerService;
 import com.vadam.sudoku.ui.MainWindow;
 
 public class SudokuApplication {
+    /**
+     * Belépési pont a Sudoku Swing alkalmazásba.
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             try {

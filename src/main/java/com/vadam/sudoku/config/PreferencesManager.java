@@ -5,9 +5,15 @@ import java.util.prefs.Preferences;
 public class PreferencesManager {
     private static final String NODE = "com.vadam.sudoku.settings";
 
+    /**
+     * Segédosztály, nem példányosítható.
+     */
     private PreferencesManager() {
     }
 
+    /**
+     * Betölti a beállításokat a felhasználó preferenciáiból, hiány esetén alapértelmezést ad.
+     */
     public static Settings loadOrDefault() {
         Preferences p = Preferences.userRoot().node(NODE);
         Settings s = new Settings();
@@ -19,6 +25,9 @@ public class PreferencesManager {
         return s;
     }
 
+    /**
+     * Elmenti a beállításokat a felhasználó preferenciáiba.
+     */
     public static void save(Settings s) {
         Preferences p = Preferences.userRoot().node(NODE);
         p.putBoolean("errorHighlight", s.isErrorHighlight());

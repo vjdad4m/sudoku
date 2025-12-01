@@ -9,6 +9,9 @@ import com.vadam.sudoku.solver.Strategy;
 import java.util.Optional;
 
 public class SingleCandidateStrategy implements Strategy {
+    /**
+     * Olyan üres cellát keres, ahol csak egyetlen jelölt megengedett.
+     */
     @Override
     public Optional<Step> next(Board board) {
         for (int r = 0; r < 9; r++) {

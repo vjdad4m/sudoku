@@ -19,6 +19,9 @@ public class SudokuGenerator {
     private final Solver uniquenessSolver = new Solver(
             List.of(new SingleCandidateStrategy(), new SinglePositionStrategy(), new NakedPairsStrategy()));
 
+    /**
+     * Létrehoz egy új Sudoku rejtvényt a megadott nehézséggel és egyedi megoldással.
+     */
     public Board generate(Difficulty difficulty) {
         Board solved = generateSolved();
         Board puzzle = new Board(solved);
@@ -54,12 +57,18 @@ public class SudokuGenerator {
         return result;
     }
 
+    /**
+     * Elkészít egy véletlenszerű, teljesen kitöltött, helyes táblát.
+     */
     private Board generateSolved() {
         Board b = new Board();
         fill(b, 0, 0);
         return b;
     }
 
+    /**
+     * Rekurzív, visszalépéses kereséssel tölti ki a megadott pozíciótól a táblát.
+     */
     private boolean fill(Board b, int r, int c) {
         if (r == 9) {
             return true;
@@ -83,6 +92,9 @@ public class SudokuGenerator {
         return false;
     }
 
+    /**
+     * Megadja, hány kiinduló számot hagyjon meg a generátor az adott nehézséghez.
+     */
     private int targetClues(Difficulty d) {
         switch (d) {
             case BEGINNER:

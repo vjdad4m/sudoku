@@ -10,15 +10,24 @@ public class GameEvent {
     private final Type type;
     private final String message;
 
+    /**
+     * Új eseményt hoz létre a típussal és opcionális üzenettel.
+     */
     public GameEvent(Type type, String message) {
         this.type = type;
         this.message = message;
     }
 
+    /**
+     * Visszaadja az esemény típusát.
+     */
     public Type getType() {
         return type;
     }
 
+    /**
+     * Visszaadja az eseményhez tartozó üzenetet vagy nullt.
+     */
     public String getMessage() {
         return message;
     }

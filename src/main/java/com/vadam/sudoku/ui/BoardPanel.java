@@ -17,6 +17,9 @@ public class BoardPanel extends JPanel {
     private int selRow = 0;
     private int selCol = 0;
 
+    /**
+     * Létrehozza a tábla kirajzolásáért felelős panelt, és regisztrálja a bemeneti kezelőket.
+     */
     public BoardPanel(GameService game, GameController controller, Settings settings) {
         this.game = game;
         this.controller = controller;
@@ -88,6 +91,9 @@ public class BoardPanel extends JPanel {
         });
     }
 
+    /**
+     * A kijelölt cellában értéket vagy ceruzajegyzetet alkalmaz a módtól függően.
+     */
     private void applyDigit(int d) {
         Position p = new Position(selRow, selCol);
         if (settings.isPencilMode()) {
@@ -97,6 +103,9 @@ public class BoardPanel extends JPanel {
         }
     }
 
+    /**
+     * Megrajzolja a táblát, a kijelöléseket, értékeket és ceruzajegyeket.
+     */
     @Override
     protected void paintComponent(Graphics graw) {
         super.paintComponent(graw);

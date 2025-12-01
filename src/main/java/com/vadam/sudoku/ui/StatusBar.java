@@ -12,6 +12,9 @@ public class StatusBar extends JPanel {
     private final JLabel timeLbl = new JLabel("00:00");
     private final JLabel msgLbl = new JLabel("Ready");
 
+    /**
+     * Státuszsávot hoz létre, amely mutatja az időt, és figyel az eseményüzenetekre.
+     */
     public StatusBar(GameService game, TimerService timer) {
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(0, 12, 0, 12));
@@ -31,6 +34,9 @@ public class StatusBar extends JPanel {
         new Timer(500, e -> timeLbl.setText(format(timer.elapsedMillis()))).start();
     }
 
+    /**
+     * Perc:másodperc formátumban adja vissza az időt.
+     */
     private String format(long ms) {
         long s = ms / 1000;
         long m = s / 60;
