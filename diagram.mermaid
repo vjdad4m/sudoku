@@ -1,0 +1,295 @@
+---
+config:
+  layout: elk
+  theme: base
+  look: neo
+---
+classDiagram
+class SudokuApplication {
+  +main(args: String[]): void
+}
+class PreferencesManager {
+  +loadOrDefault(): Settings
+  +save(settings: Settings): void
+}
+
+class Settings {
+  -errorHighlight: boolean
+  -autoPencilUpdate: boolean
+  -applyHint: boolean
+  -highlightSameDigits: boolean
+  -pencilMode: boolean
+  +setChangeListener(listener: java.util.function.Consumer~Settings~): void
+}
+class GameController {
+  +newGame(difficulty: Difficulty): void
+  +setValue(pos: Position, digit: int): void
+  +toggleNote(pos: Position, digit: int): void
+  +undo(): void
+  +redo(): void
+  +showHint(apply: boolean): void
+  +check(): void
+  +solve(): void
+  +save(path: java.nio.file.Path): void
+  +load(path: java.nio.file.Path): void
+  +importPuzzle(path: java.nio.file.Path): void
+  +exportPuzzle(path: java.nio.file.Path): void
+}
+class SudokuException
+class InvalidMoveException
+class PersistenceException
+class PuzzleUnsolvableException
+class PuzzleDifficultyEstimator {
+  +estimate(board: Board): int
+}
+
+class SudokuGenerator {
+  +generate(difficulty: Difficulty): Board
+}
+class Board {
+  +get(pos: Position): int
+  +setValue(pos: Position, value: int): void
+  +clearValue(pos: Position): void
+  +isSolved(): boolean
+}
+
+class CandidateSet {
+  +has(digit: int): boolean
+  +toggle(digit: int): void
+  +clear(): void
+}
+
+class Difficulty {
+  <<enumeration>>
+  BEGINNER
+  EASY
+  MEDIUM
+  HARD
+  EXPERT
+}
+
+class GameStatus {
+  <<enumeration>>
+  IN_PROGRESS
+  SOLVED
+}
+
+class Move {
+  <<abstract>>
+}
+
+class MoveValue {
+  +pos: Position
+  +before: int
+  +after: int
+}
+
+class MoveNoteToggle {
+  +pos: Position
+  +digit: int
+}
+
+class Position {
+  +row(): int
+  +col(): int
+}
+
+class GameState {
+  +getValues(): int[][]
+  +getFixed(): boolean[][]
+  +getElapsedMillis(): long
+  +getDifficulty(): Difficulty
+}
+class EventBus {
+  +add(listener: GameEventListener): void
+  +remove(listener: GameEventListener): void
+  +publish(event: GameEvent): void
+}
+
+class GameEvent {
+  +getType(): GameEventType
+  +getMessage(): String
+}
+
+class GameEventType {
+  <<enumeration>>
+  BOARD_CHANGED
+  NEW_GAME
+  TIMER_TICK
+  SOLVED
+  MESSAGE
+}
+
+class GameEventListener {
+  <<interface>>
+  +onEvent(event: GameEvent): void
+}
+class GameRepository {
+  <<interface>>
+  +save(path: java.nio.file.Path, state: GameState): void
+  +load(path: java.nio.file.Path): java.util.Optional~GameState~
+}
+
+class FileGameRepository {
+  +save(path: java.nio.file.Path, state: GameState): void
+  +load(path: java.nio.file.Path): java.util.Optional~GameState~
+}
+
+class ImportExportService {
+  +importFromString(data: String): Board
+  +exportToString(board: Board): String
+  +exportToFile(board: Board, path: java.nio.file.Path): void
+  +importFromFile(path: java.nio.file.Path): Board
+}
+class GameService {
+  +board(): Board
+  +settings(): Settings
+  +difficulty(): Difficulty
+  +newGame(board: Board, difficulty: Difficulty): void
+  +setValue(pos: Position, digit: int): void
+  +clearValue(pos: Position): void
+  +toggleNote(pos: Position, digit: int): void
+  +undo(): void
+  +redo(): void
+  +refreshBoard(): void
+  +markAutoSolvePending(): void
+  +clearAutoSolvePending(): void
+  +check(): java.util.Optional~String~
+}
+
+class HintService {
+  +nextStep(board: Board): java.util.Optional~Step~
+  +applyLogical(board: Board): int
+  +solveFully(board: Board): boolean
+}
+
+class StatisticsService {
+  +recordGame(difficulty: Difficulty, durationMs: long): void
+  +bestTime(difficulty: Difficulty): java.util.Optional~Long~
+  +gameCount(difficulty: Difficulty): int
+}
+
+class TimerService {
+  +start(): void
+  +stop(): void
+  +reset(): void
+  +setElapsedMillis(value: long): void
+  +elapsedMillis(): long
+  +isRunning(): boolean
+}
+class Strategy {
+  <<interface>>
+  +next(board: Board): java.util.Optional~Step~
+}
+
+class Solver {
+  +nextStep(board: Board): java.util.Optional~Step~
+  +solveLogically(board: Board): java.util.List~Step~
+  +solveBacktracking(board: Board): boolean
+  +countSolutions(board: Board, limit: int): int
+}
+
+class Step {
+  +getType(): StepType
+  +getPosition(): Position
+  +getDigit(): int
+  +getExplanation(): String
+}
+
+class StepType {
+  <<enumeration>>
+  SINGLE_CANDIDATE
+  SINGLE_POSITION
+  NAKED_PAIR
+  GUESS
+}
+
+class SingleCandidateStrategy {
+  +next(board: Board): java.util.Optional~Step~
+}
+
+class SinglePositionStrategy {
+  +next(board: Board): java.util.Optional~Step~
+}
+
+class NakedPairsStrategy {
+  +next(board: Board): java.util.Optional~Step~
+}
+class BoardPanel {
+  +applyDigit(digit: int): void
+}
+
+class MainWindow
+
+class StatusBar
+class ValidationUtils {
+  +isValid(values: int[][]): boolean
+}
+SudokuException <|-- InvalidMoveException
+SudokuException <|-- PersistenceException
+SudokuException <|-- PuzzleUnsolvableException
+
+GameRepository <|.. FileGameRepository
+
+Move <|-- MoveValue
+Move <|-- MoveNoteToggle
+
+Strategy <|.. SingleCandidateStrategy
+Strategy <|.. SinglePositionStrategy
+Strategy <|.. NakedPairsStrategy
+MoveValue --> Position
+MoveNoteToggle --> Position
+
+GameEvent o-- GameEventType
+EventBus --> GameEventListener
+EventBus --> GameEvent
+
+Solver --> Step
+Solver --> Strategy
+Step --> StepType
+Step --> Position
+
+Board --> CandidateSet
+Board --> Position
+GameState --> Difficulty
+
+GameController --> GameService
+GameController --> SudokuGenerator
+GameController --> HintService
+GameController --> TimerService
+GameController --> FileGameRepository
+GameController --> ImportExportService
+
+FileGameRepository --> GameState
+ImportExportService --> Board
+
+GameService --> Board
+GameService --> EventBus
+GameService --> Settings
+GameService --> Difficulty
+GameService --> Move
+
+HintService --> Solver
+StatisticsService --> Difficulty
+TimerService --> EventBus
+
+BoardPanel --> GameService
+BoardPanel --> GameController
+BoardPanel --> Settings
+
+MainWindow --> GameController
+MainWindow --> GameService
+MainWindow --> TimerService
+MainWindow --> Settings
+MainWindow --> StatisticsService
+MainWindow --> BoardPanel
+MainWindow --> StatusBar
+
+StatusBar --> GameService
+StatusBar --> TimerService
+
+SudokuGenerator --> Solver
+PuzzleDifficultyEstimator --> Board
+
+PreferencesManager --> Settings
+ValidationUtils --> Board
